@@ -1,9 +1,8 @@
 # imports go here
-import pyautogui
 # i dont understand why it only works with the * import
 from tkinter import *
 from tkinter import ttk
-import json
+import json, os, pyautogui
 
 """
 JSON File Reader Python Program
@@ -18,6 +17,20 @@ file_name: str = "contents_file.json"
 window_box = Tk()
 # file input window
 window_input_box = Tk()
+
+
+def file_system_stuff(file_name: str) -> str:
+    """
+    The file directory system, is run whenever a file is opened or created
+    """
+    # the name of the folder where the JSON files are stored
+    folder_name: str = "JSON files"
+    # create the folder IF it does not exist
+    os.makedirs(folder_name, exist_ok=True)
+    # stitch the file path together so the files are under the correct location
+    file_path = os.path.join(folder_name, file_name)
+
+    return file_path
 
 
 def box_appearance(chosen_window: Tk, window_size_x: int, window_size_y: int):
@@ -52,13 +65,18 @@ def pull_file_contents() -> str:
     # the "window_contents" for this function (done to prevent possible errors)
     file_data = "No JSON file found to read."
 
+    # get file path to find file, separate line to make it easier to follow
+    file_path = file_system_stuff(file_name)
     # looks for JSON file and takes contents
     try:
-        with open(f"{file_name}", "r") as contents:
+        with open(file_path, "r") as contents:
             file_data = json.load(contents)
         print("Obtained JSON file")
     except FileNotFoundError:
-        print("JSON file not found, reverting to fallback contents")
+        print("JSON file not found, reverting to fallback contents.")
+        no_file_found()
+    except json.decoder.JSONDecodeError:
+        print("JSON file is empty, reverting to fallback contents.")
         no_file_found()
 
     return file_data
@@ -87,10 +105,10 @@ def create_file(user_str: str):
     """
     Creates the JSON file and saves it to the correct directory location
     """
-    print(f"{user_str}") # for testing purposes only - remove once working as intended
+    file_path = file_system_stuff(file_name)
 
-    with open(f"{file_name}", "w"):
-        json.dumps(user_str)
+    with open(file_path, "w") as contents:
+        json.dump(user_str, contents)
         print(f"File contents '{user_str}' have been successfully saved in the file named '{file_name}'.")
 
 
@@ -99,7 +117,6 @@ def main():
     The main block where all other main functions are called through
     for easy access and modification of the program
     """
-
     # first set appearance
     box_appearance(window_box, 0, 0)
     # then set contents (in case of override)
