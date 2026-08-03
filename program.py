@@ -69,7 +69,7 @@ def no_file_found():
     This function triggers if there is no JSON file found to read from
     it allows the user to create a new file to read from 
     """
-    user_file_input = StringVar()
+    user_file_input = StringVar(window_input_box)
 
     # create new window box to let user create a file
     box_appearance(window_input_box, 0, 2)
@@ -80,19 +80,18 @@ def no_file_found():
     user_input.grid(column=0, row=0, padx=30, pady=20)
 
     # file input confirmation button
-    ttk.Button(window_input_box, text="Save", command=create_file).grid(column=0, row=1)
+    ttk.Button(window_input_box, text="Save", command=lambda: create_file(user_file_input.get())).grid(column=0, row=1)
 
 
-def create_file():
+def create_file(user_str: str):
     """
     Creates the JSON file and saves it to the correct directory location
     """
-    user_str: str = str(user_file_input.get())
-    print(f"{user_str}")
-    
+    print(f"{user_str}") # for testing purposes only - remove once working as intended
+
     with open(f"{file_name}", "w"):
         json.dumps(user_str)
-        print(f"File contents successfully saved as '{file_name}'")
+        print(f"File contents '{user_str}' have been successfully saved in the file named '{file_name}'.")
 
 
 def main():
