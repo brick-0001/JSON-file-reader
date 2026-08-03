@@ -5,61 +5,95 @@ from tkinter import *
 from tkinter import ttk
 import json
 
+"""
+JSON File Reader Python Program
+"""
 
 __author__ = "Brick"
 
-dialog_contents: str
+window_contents: str
+user_file_input: StringVar
+file_name: str = "contents_file.json"
+# main window
+window_box = Tk()
+# file input window
+window_input_box = Tk()
 
-dialog_box = Tk()
 
-# the data taken from the file in form [title, contents]
-dialog_data: tuple [str, str]
-
-def box_appearance():
+def box_appearance(chosen_window: Tk, window_size_x: int, window_size_y: int):
     """
-    The function which contains all the contents for how the dialog boxes are to be displayed
+    The function which contains all the contents for how the window boxes are to be displayed
     This can be considered a preset for how the box looks
     """
     # some column and row configuration - dont really understand this part
-    dialog_box.columnconfigure(0, weight=1)
-    dialog_box.rowconfigure(0, weight=1)
+    chosen_window.columnconfigure(window_size_x, weight=1)
+    chosen_window.rowconfigure(window_size_y, weight=1)
+
 
 def box_contents():
     """
-    The function which obtains all the info that goes into the dialog box
+    The function which obtains all the info that goes into the window box
     and the stuff that affects the appearance because of the contents
     """
-    # obtain the contents of the file to be used in the dialog box
-    dialog_data = pull_file_contents()
+    # obtain the contents of the file to be used in the window box
+    window_contents = pull_file_contents()
 
-    # set dialog box title
-    dialog_box.title("JSON file reader")
+    # set window box title
+    window_box.title("JSON file reader")
 
-    # set dialog box contents
-    ttk.Label(dialog_box, text=f"{dialog_data}").grid(column=0, row=0, padx=30, pady=20)
+    # set window box contents
+    ttk.Label(window_box, text=f"{window_contents}").grid(column=0, row=0, padx=30, pady=20)
+
 
 def pull_file_contents() -> str:
     """
     Obtain the data from the specified file
     """
+    # the "window_contents" for this function (done to prevent possible errors)
     file_data = "No JSON file found to read."
 
     # looks for JSON file and takes contents
     try:
-        with open("contents_file.json", "r") as contents:
+        with open(f"{file_name}", "r") as contents:
             file_data = json.load(contents)
-        print("Obtained current wordList.json")
+        print("Obtained JSON file")
     except FileNotFoundError:
         print("JSON file not found, reverting to fallback contents")
         no_file_found()
 
     return file_data
 
+
 def no_file_found():
     """
     This function triggers if there is no JSON file found to read from
     it allows the user to create a new file to read from 
     """
+    user_file_input = StringVar()
+
+    # create new window box to let user create a file
+    box_appearance(window_input_box, 0, 2)
+    window_input_box.title("String input window")
+
+    # text input appearance
+    user_input = ttk.Entry(window_input_box, width=21, textvariable = user_file_input)
+    user_input.grid(column=0, row=0, padx=30, pady=20)
+
+    # file input confirmation button
+    ttk.Button(window_input_box, text="Save", command=create_file).grid(column=0, row=1)
+
+
+def create_file():
+    """
+    Creates the JSON file and saves it to the correct directory location
+    """
+    user_str: str = str(user_file_input.get())
+    print(f"{user_str}")
+    
+    with open(f"{file_name}", "w"):
+        json.dumps(user_str)
+        print(f"File contents successfully saved as '{file_name}'")
+
 
 def main():
     """
@@ -68,11 +102,11 @@ def main():
     """
 
     # first set appearance
-    box_appearance()
+    box_appearance(window_box, 0, 0)
     # then set contents (in case of override)
     box_contents()
 
-    dialog_box.mainloop()
+    window_box.mainloop()
 
 
 if __name__ == "__main__":
