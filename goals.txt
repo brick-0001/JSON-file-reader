@@ -3,19 +3,22 @@ What do I want this project to be?
 - something that utilises python and json
 - something interesting
 
-Dialog popup which shows formatted text from json files
+window which shows formatted text from json files
 
 
 What the program needs to let the user do:
 - able to edit the text for the popup in another popup
 - popup must have "close" and "edit" buttons which work as intended
+    * window does not have a "close" button but can be closed with normal system buttons
+    * edit button does not exist yet
 - popup must close itself when "edit" selected and open a new focussed popup
+    * window does not close itself and new window is focussed but still behind main window
 - when edit is confirmed must close editing popup and open the text popup
-
+    * does not automatically close the editing window yet
 
 
 What to add once initial program is complete and fully functional:
 - ability to select from multiple files
-    * file selection
-    * view all files in the folder containing json
+    * file selection (dropdown list or text input)
+    * view all files in the folder containing the JSON files
     * able to create, edit or delete text files
