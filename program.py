@@ -22,6 +22,12 @@ window_box = Tk()
 # file input window
 window_input_box = Tk()
 
+# set window box title
+window_box.title("JSON file reader")
+# set window box size
+content_label = ttk.Label(window_box, text="")
+content_label.grid(column=0, row=1, padx=30, pady=20)
+
 
 def get_screen_dimensions() -> tuple [int, int, int, int]:
     """
@@ -63,8 +69,8 @@ def box_appearance(chosen_window: Tk, window_columns: int, window_rows: int, win
         # sets the offset of the input window by +10%
         # must be converted to a list to edit the tuple
         window_geo_list = list(window_geo)
-        window_geo_list[2] = int(window_geo_list[2] * 1.1)
-        window_geo_list[3] = int(window_geo_list[3] * 1.1)
+        window_geo_list[2] = int(window_geo_list[2] * 2.0)
+        window_geo_list[3] = int(window_geo_list[3] * 1.0)
         # converted back to a tuple
         window_geo = window_geo_list[0], window_geo_list[1], window_geo_list[2], window_geo_list[3]
 
@@ -80,12 +86,9 @@ def box_contents():
     window_contents = pull_file_contents()
     # 'cleans' the string by removing excess / that are automatically put in (eg. \\n -> \n)
     cleaned_contents: str = bytes(window_contents, "utf-8").decode("unicode_escape")
-
-    # set window box title
-    window_box.title("JSON file reader")
-
-    # set window box contents
-    ttk.Label(window_box, text=f"{cleaned_contents}").grid(column=0, row=1, padx=30, pady=20)
+    
+    # set window box contents (replaces what is there)
+    content_label.config(text=f"{cleaned_contents}")
 
 
 def pull_file_contents() -> str:
@@ -145,6 +148,9 @@ def create_file(user_str: str):
     with open(file_path, "w") as contents:
         json.dump(user_str, contents)
         print(f"File contents '{user_str}' have been successfully saved in the file named '{file_name}'.")
+
+    # updates the main window contents
+    box_contents()
 
 
 def main():
