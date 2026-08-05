@@ -78,12 +78,14 @@ def box_contents():
     """
     # obtain the contents of the file to be used in the window box
     window_contents = pull_file_contents()
+    # 'cleans' the string by removing excess / that are automatically put in (eg. \\n -> \n)
+    cleaned_contents: str = bytes(window_contents, "utf-8").decode("unicode_escape")
 
     # set window box title
     window_box.title("JSON file reader")
 
     # set window box contents
-    ttk.Label(window_box, text=f"{window_contents}").grid(column=0, row=1, padx=30, pady=20)
+    ttk.Label(window_box, text=f"{cleaned_contents}").grid(column=0, row=1, padx=30, pady=20)
 
 
 def pull_file_contents() -> str:
@@ -104,16 +106,16 @@ def pull_file_contents() -> str:
     except FileNotFoundError:
         print("JSON file not found, reverting to fallback contents.")
         ttk.Label(window_box, text=f"{file_name} not found").grid(column=0, row=0, sticky=S)
-        no_file_found()
+        create_or_edit_file()
     except json.decoder.JSONDecodeError:
         print("JSON file is empty, reverting to fallback contents.")
         ttk.Label(window_box, text=f"{file_name} contents not found").grid(column=0, row=0, sticky=S)
-        no_file_found()
+        create_or_edit_file()
 
     return file_data
 
 
-def no_file_found():
+def create_or_edit_file():
     """
     This function triggers if there is no JSON file found to read from
     it allows the user to create a new file to read from 
