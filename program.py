@@ -10,6 +10,7 @@ JSON File Reader Python Program
 
 __author__ = "Brick"
 
+
 window_contents: str
 user_file_input: StringVar
 file_name: str = "contents_file.json"
@@ -164,7 +165,7 @@ def main():
     box_contents()
 
     window_box.mainloop()
-    # just a little print statement informing the user that the window has shut successfully
+    # just a little print statement informing the user that the entire program has stopped
     print("program successfully shut down")
 
 
