@@ -14,7 +14,7 @@ __author__ = "Brick"
 window_contents: str
 user_file_input: StringVar
 file_name: str = "contents_file.json"
-# window size data
+# window size data as [x size, y size, x offset, y offset]
 window_size: tuple [int, int, int, int]
 
 # main window
@@ -71,7 +71,6 @@ def box_appearance(chosen_window: Tk, window_columns: int, window_rows: int, win
         # must be converted to a list to edit the tuple
         window_geo_list = list(window_geo)
         window_geo_list[2] = int(window_geo_list[2] * 2.0)
-        window_geo_list[3] = int(window_geo_list[3] * 1.0)
         # converted back to a tuple
         window_geo = window_geo_list[0], window_geo_list[1], window_geo_list[2], window_geo_list[3]
 
