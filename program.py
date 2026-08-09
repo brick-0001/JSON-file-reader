@@ -1,5 +1,5 @@
 # imports go here
-# i dont understand why it only works with the * import
+# i dont understand why it works with the * import but not importing tkinter itself
 from tkinter import *
 from tkinter import ttk
 import json, os, pyautogui
@@ -90,6 +90,9 @@ def box_contents():
     # set window box contents (replaces what is there)
     content_label.config(text=f"{cleaned_contents}")
 
+    # button to edit the JSON file
+    ttk.Button(window_box, text="Edit", command=lambda: create_or_edit_file()).grid(column=0, row=2)
+
 
 def pull_file_contents() -> str:
     """
@@ -123,10 +126,13 @@ def create_or_edit_file():
     This function triggers if there is no JSON file found to read from
     it allows the user to create a new file to read from 
     """
+    # brings the window into view if it has been withdrawn previously
+    window_input_box.deiconify()
+
     user_file_input = StringVar(window_input_box)
 
     # create new window box to let user create a file
-    box_appearance(window_input_box, 0, 3, get_screen_dimensions())
+    box_appearance(window_input_box, 0, 4, get_screen_dimensions())
     window_input_box.title("String input window")
 
     # text input appearance
@@ -136,6 +142,8 @@ def create_or_edit_file():
 
     # file input confirmation button
     ttk.Button(window_input_box, text="Save", command=lambda: create_file(user_file_input.get())).grid(column=0, row=2)
+    # close the window without killing it so it can be brought back again
+    ttk.Button(window_input_box, text="Close Window", command=lambda: window_input_box.withdraw()).grid(column=0, row=3)
 
 
 def create_file(user_str: str):
@@ -159,7 +167,7 @@ def main():
     for easy access and modification of the program
     """
     # first set appearance (gets the monitor dimensions for sizing)
-    box_appearance(window_box, 0, 1, get_screen_dimensions())
+    box_appearance(window_box, 0, 2, get_screen_dimensions())
     # then set contents (in case of override)
     box_contents()
 
