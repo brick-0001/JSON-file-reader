@@ -14,7 +14,7 @@ __author__ = "Brick"
 window_contents: str
 user_file_input: StringVar
 select_file_input: StringVar
-file_name: str = "contents_file.json"
+selected_file_name: str = "contents_file.json"
 # window size data as [x size, y size, x offset, y offset]
 window_size: tuple [int, int, int, int]
 
@@ -22,12 +22,14 @@ window_size: tuple [int, int, int, int]
 window_box = Tk()
 # file input window
 window_input_box = Tk()
+window_input_box.withdraw()
 # file selection window
 window_file_select_box = Tk()
 
 # set window box title
 window_box.title("JSON file reader")
-# set window box size
+file_label = ttk.Label(window_box, text="")
+file_label.grid(column=0, row=0, columnspan=2)
 content_label = ttk.Label(window_box, text="")
 content_label.grid(column=0, row=1, padx=30, pady=20, columnspan=2)
 
@@ -121,20 +123,20 @@ def pull_file_contents() -> str:
     file_data = "No JSON file found to read."
 
     # get file path to find file, separate line to make it easier to follow
-    file_path = file_system_stuff(file_name)
+    file_path = file_system_stuff(selected_file_name)
     # looks for JSON file and takes contents
     try:
         with open(file_path, "r") as contents:
             file_data = json.load(contents)
-            ttk.Label(window_box, text=f"{file_name} contents:").grid(column=0, row=0, columnspan=2)
+            file_label.config(text=f"{selected_file_name} contents:")
         print("Obtained JSON file")
     except FileNotFoundError:
         print("JSON file not found, reverting to fallback contents.")
-        ttk.Label(window_box, text=f"{file_name} not found").grid(column=0, row=0, columnspan=2)
+        file_label.config(text=f"{selected_file_name} not found")
         create_or_edit_file()
     except json.decoder.JSONDecodeError:
         print("JSON file is empty, reverting to fallback contents.")
-        ttk.Label(window_box, text=f"{file_name} contents not found").grid(column=0, row=0, columnspan=2)
+        file_label.config(text=f"{selected_file_name} contents not found")
         create_or_edit_file()
 
     return file_data
@@ -170,11 +172,11 @@ def create_file(user_str: str):
     Creates the JSON file and saves it to the correct directory location
     """
     # get file path
-    file_path = file_system_stuff(file_name)
+    file_path = file_system_stuff(selected_file_name)
 
     with open(file_path, "w") as contents:
         json.dump(user_str, contents)
-        print(f"File contents '{user_str}' have been successfully saved in the file named '{file_name}'.")
+        print(f"File contents '{user_str}' have been successfully saved in the file named '{selected_file_name}'.")
 
     # updates the main window contents
     box_contents()
@@ -204,11 +206,12 @@ def set_file(file_input_name):
     Sets the JSON file to the user's selected file if it is in the directory
     Creates the JSON file if it does not exist
     """
+    global selected_file_name
     # get file path
     file_name: str = file_input_name+".json"
     file_path = file_system_stuff(file_name)
 
-    if (os.path.isfile(file_name)):
+    if (os.path.isfile(file_path)):
         # if the file currently exists
         print(f"File '{file_name}' has been located successfully")
     else:
@@ -218,6 +221,7 @@ def set_file(file_input_name):
             json.dump("", contents)
             print(f"File '{file_name}' has been created successfully")
 
+    selected_file_name = file_name
     print(file_name)
     box_contents()
 
