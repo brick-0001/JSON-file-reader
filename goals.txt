@@ -10,15 +10,22 @@ What the program needs to let the user do:
 - able to edit the text for the popup in another popup
 - popup must have "close" and "edit" buttons which work as intended
     * window does not have a "close" button but can be closed with normal system buttons
-    * edit button does not exist yet
+    * edit button fully implemented
 - popup must close itself when "edit" selected and open a new focussed popup
-    * window does not close itself and new window is focussed but still behind main window
+    * window does not close itself and new window is focussed to the right of the main window
 - when edit is confirmed must close editing popup and open the text popup
-    * does not automatically close the editing window yet
+    * does not automatically close the editing window but automatically updates the main window
 
 
 What to add once initial program is complete and fully functional:
 - ability to select from multiple files
     * file selection (dropdown list or text input)
+        - text input option implemented, dropdown list and text input autocomplete not planned
     * view all files in the folder containing the JSON files
+        - not implemented and no plans to implemented
     * able to create, edit or delete text files
+        - no text file support has been implemented, it requires lots of refactoring to support both file types
+
+
+
+the peoject in the current state is considered complete
