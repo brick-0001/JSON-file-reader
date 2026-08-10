@@ -222,7 +222,6 @@ def set_file(file_input_name):
             print(f"File '{file_name}' has been created successfully")
 
     selected_file_name = file_name
-    print(file_name)
     box_contents()
 
 def main():

@@ -28,4 +28,15 @@ What to add once initial program is complete and fully functional:
 
 
 
-the peoject in the current state is considered complete
+
+
+the project in the current state is considered complete
+
+
+
+
+
+Planned branch goals:
+- converting all print statements into alert window popups
+
+Completed branch goals:
