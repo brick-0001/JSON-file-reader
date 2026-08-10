@@ -13,21 +13,23 @@ __author__ = "Brick"
 
 window_contents: str
 user_file_input: StringVar
+select_file_input: StringVar
 file_name: str = "contents_file.json"
 # window size data as [x size, y size, x offset, y offset]
 window_size: tuple [int, int, int, int]
 
 # main window
 window_box = Tk()
-
 # file input window
 window_input_box = Tk()
+# file selection window
+window_file_select_box = Tk()
 
 # set window box title
 window_box.title("JSON file reader")
 # set window box size
 content_label = ttk.Label(window_box, text="")
-content_label.grid(column=0, row=1, padx=30, pady=20)
+content_label.grid(column=0, row=1, padx=30, pady=20, columnspan=2)
 
 
 def get_screen_dimensions() -> tuple [int, int, int, int]:
@@ -66,13 +68,22 @@ def box_appearance(chosen_window: Tk, window_columns: int, window_rows: int, win
     chosen_window.columnconfigure(window_columns, weight=1)
     chosen_window.rowconfigure(window_rows, weight=1)
 
+    # must be converted to a list to edit the tuple
+    window_geo_list = list(window_geo)
+
     if (chosen_window == window_input_box):
         # sets the offset of the input window by +10%
-        # must be converted to a list to edit the tuple
-        window_geo_list = list(window_geo)
         window_geo_list[2] = int(window_geo_list[2] * 2.0)
-        # converted back to a tuple
-        window_geo = window_geo_list[0], window_geo_list[1], window_geo_list[2], window_geo_list[3]
+
+    if (chosen_window == window_file_select_box):
+        # shrinks the window as it is not meant to be a main window
+        window_geo_list[0] = int(window_geo_list[0] * 0.6)
+        window_geo_list[1] = int(window_geo_list[1] * 0.5)
+        # sets the offset for the window to be left of the main window
+        window_geo_list[2] = int(window_geo_list[2] * 0.4)
+
+    # converted back to a tuple
+    window_geo = window_geo_list[0], window_geo_list[1], window_geo_list[2], window_geo_list[3]
 
     chosen_window.geometry(f"{window_geo[0]}x{window_geo[1]}+{window_geo[2]}+{window_geo[3]}")
 
@@ -91,7 +102,15 @@ def box_contents():
     content_label.config(text=f"{cleaned_contents}")
 
     # button to edit the JSON file
-    ttk.Button(window_box, text="Edit", command=lambda: create_or_edit_file()).grid(column=0, row=2)
+    edit_btn = ttk.Button(window_box, text="Edit", command=lambda: create_or_edit_file())
+    edit_btn.grid(column=0, row=2, padx=10, sticky=E)
+    # button to open file selection
+    file_select_btn = ttk.Button(window_box, text="Select File", command=lambda: select_JSON_file())
+    file_select_btn.grid(column=1, row=2, padx=10, sticky=W)
+
+    # makes the columns split the window 50/50 down the middle no matter the size
+    window_box.grid_columnconfigure(0, weight=1)
+    window_box.grid_columnconfigure(1, weight=1)
 
 
 def pull_file_contents() -> str:
@@ -107,15 +126,15 @@ def pull_file_contents() -> str:
     try:
         with open(file_path, "r") as contents:
             file_data = json.load(contents)
-            ttk.Label(window_box, text=f"{file_name} contents:").grid(column=0, row=0, sticky=S)
+            ttk.Label(window_box, text=f"{file_name} contents:").grid(column=0, row=0, columnspan=2)
         print("Obtained JSON file")
     except FileNotFoundError:
         print("JSON file not found, reverting to fallback contents.")
-        ttk.Label(window_box, text=f"{file_name} not found").grid(column=0, row=0, sticky=S)
+        ttk.Label(window_box, text=f"{file_name} not found").grid(column=0, row=0, columnspan=2)
         create_or_edit_file()
     except json.decoder.JSONDecodeError:
         print("JSON file is empty, reverting to fallback contents.")
-        ttk.Label(window_box, text=f"{file_name} contents not found").grid(column=0, row=0, sticky=S)
+        ttk.Label(window_box, text=f"{file_name} contents not found").grid(column=0, row=0, columnspan=2)
         create_or_edit_file()
 
     return file_data
@@ -137,7 +156,7 @@ def create_or_edit_file():
 
     # text input appearance
     ttk.Label(window_input_box, text="Input new text below").grid(column=0, row=0, sticky=S)
-    user_input = ttk.Entry(window_input_box, width=21, textvariable = user_file_input)
+    user_input = ttk.Entry(window_input_box, width=43, textvariable = user_file_input)
     user_input.grid(column=0, row=1, padx=30, pady=20)
 
     # file input confirmation button
@@ -161,13 +180,54 @@ def create_file(user_str: str):
     box_contents()
 
 
+def select_JSON_file():
+    """
+    Creates a window which gets the name of the JSON file the user wants to load
+    """
+    select_file_input = StringVar(window_file_select_box)
+    window_file_select_box.title("File Selection")
+
+    # set the window size and location 
+    box_appearance(window_file_select_box, 0, 1, get_screen_dimensions())
+
+    # sets contents of the window
+    ttk.Label(window_file_select_box, text="input file name to select\n(no .json extension)").grid(column=0, row=0, sticky=N)
+    file_input = ttk.Entry(window_file_select_box, width=14, textvariable = select_file_input)
+    file_input.grid(column=0, row=1, padx=30, pady=20)
+
+    # button to confirm name of file
+    ttk.Button(window_file_select_box, text="Select File", command=lambda: set_file(select_file_input.get())).grid(column=0, row=2)
+
+
+def set_file(file_input_name):
+    """
+    Sets the JSON file to the user's selected file if it is in the directory
+    Creates the JSON file if it does not exist
+    """
+    # get file path
+    file_name: str = file_input_name+".json"
+    file_path = file_system_stuff(file_name)
+
+    if (os.path.isfile(file_name)):
+        # if the file currently exists
+        print(f"File '{file_name}' has been located successfully")
+    else:
+        # if the file does not exist yet it will be created in the directory
+        print(f"The file named '{file_name}' does not exist in the current directory, the file will be created")
+        with open(file_path, "w") as contents:
+            json.dump("", contents)
+            print(f"File '{file_name}' has been created successfully")
+
+    print(file_name)
+    box_contents()
+
 def main():
     """
     The main block where all other main functions are called through
     for easy access and modification of the program
     """
     # first set appearance (gets the monitor dimensions for sizing)
-    box_appearance(window_box, 0, 2, get_screen_dimensions())
+    box_appearance(window_box, 1, 2, get_screen_dimensions())
     # then set contents (in case of override)
     box_contents()
 
